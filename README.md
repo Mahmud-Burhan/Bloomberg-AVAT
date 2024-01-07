@@ -1,5 +1,5 @@
 # Bloomberg-AVAT
-AVAT function inspired from Bloomberg Terminal to guide traders assessing recent momentum from volume analysis.
+AVAT (Average Volume at Time) function inspired from Bloomberg Terminal to guide traders assessing recent momentum from volume analysis.
 
 ## Libraries required
 - Jupyter Notebook
