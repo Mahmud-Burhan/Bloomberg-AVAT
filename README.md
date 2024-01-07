@@ -15,7 +15,7 @@ AVAT function inspired from Bloomberg Terminal to guide traders assessing recent
 4. These AVAT graphs can then be consumed to help with investment decisions (this is not a financial advice).
 
 ## Credits and links
-Inspired from: [Bloomberg](https://www.bloomberg.com/uk)
-AVAT link: [Bloomberg Trading Analytics](https://data.bloomberglp.com/professional/sites/10/2-Trading-analytics.pdf)
-yfinance API interval guides: [QMR.AI](https://www.qmr.ai/yfinance-library-the-definitive-guide/)
-Formula: [Relative Change](https://en.wikipedia.org/wiki/Relative_change)
+- Inspired from: [Bloomberg](https://www.bloomberg.com/uk)
+- AVAT link: [Bloomberg Trading Analytics](https://data.bloomberglp.com/professional/sites/10/2-Trading-analytics.pdf)
+- yfinance API interval guides: [QMR.AI](https://www.qmr.ai/yfinance-library-the-definitive-guide/)
+- Formula: [Relative Change](https://en.wikipedia.org/wiki/Relative_change)
