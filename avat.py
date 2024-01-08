@@ -1,12 +1,13 @@
 # AVAT Function inspired from Bloomberg Terminal
 # Replicated by: Mahmud bin Burhanudin (github.com/Mahmud-Burhan)
 # Date: 2024-01-07
-# Version: 1.0.0
+# Version: 2.0.0
 
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import yfinance as yf
+from datetime import datetime
 
 get_ticker = str(input("Enter ticker: "))
 get_days_range = int(input("Enter days range: (any integer 1-730) "))
@@ -17,8 +18,23 @@ if ticker.empty:
     raise Exception("Ticker not found")
 ticker = ticker.drop(columns=['Dividends', 'Stock Splits'])
 
-mod_ticker = ticker.copy()
-mod_ticker = mod_ticker[:-7] # remove last 7 rows
+recent_date = datetime.now().strftime('%Y-%m-%d')
+weekday = datetime.today().weekday()
+time = datetime.now().strftime('%H:%M:%S')
+ # 9:30 AM EST where the market opens, CHANGE ACCORDING TO YOUR TIMEZONE AND DAYLIGHT SAVING
+MARKET_OPEN = "14:30:00" # THIS IS 2:30 PM GMT (UK TIME)
+# If the day is Saturday or Sunday or Monday and market doesnt open yet, get the Friday's date
+# else if the time is before the market opens, get the previous day's date
+if weekday >= 5 or (weekday == 0 and time < MARKET_OPEN):
+    day_to_subtract = weekday - 4
+    if weekday == 0:
+        day_to_subtract = 3
+    recent_date = (datetime.now() - pd.Timedelta(days=day_to_subtract)).strftime('%Y-%m-%d')
+elif time < MARKET_OPEN:
+    recent_date = (datetime.now() - pd.Timedelta(days=1)).strftime('%Y-%m-%d')
+recent_date = recent_date + " 00:00:00"
+
+mod_ticker = ticker.loc[:recent_date].copy()
 mod_ticker["Hour"] = mod_ticker.index.hour # get the hour
 mod_ticker = mod_ticker.sort_values(by=['Hour'])
 
@@ -52,26 +68,22 @@ seventh_hour = np.mean(seventh_hour) + sixth_hour
 
 cumulative_volume = [first_hour, second_hour, third_hour, fourth_hour, fifth_hour, sixth_hour, seventh_hour]
 
-comparison_ticker = ticker[-7:] # get last 7 rows, DO NOT USE MOD_TICKER
-c_first_hour = comparison_ticker.iloc[0]['Volume']; c_second_hour = comparison_ticker.iloc[1]['Volume']
-c_third_hour = comparison_ticker.iloc[2]['Volume']; c_fourth_hour = comparison_ticker.iloc[3]['Volume']
-c_fifth_hour = comparison_ticker.iloc[4]['Volume']; c_sixth_hour = comparison_ticker.iloc[5]['Volume']
-c_seventh_hour = comparison_ticker.iloc[6]['Volume']
-# Convert to mean and set the cumulative volume
-c_first_hour = np.mean(c_first_hour); c_second_hour = np.mean(c_second_hour) + c_first_hour
-c_third_hour = np.mean(c_third_hour) + c_second_hour; c_fourth_hour = np.mean(c_fourth_hour) + c_third_hour
-c_fifth_hour = np.mean(c_fifth_hour) + c_fourth_hour; c_sixth_hour = np.mean(c_sixth_hour) + c_fifth_hour
-c_seventh_hour = np.mean(c_seventh_hour) + c_sixth_hour
+comparison_ticker = ticker[recent_date:] # get recent data
+comparison_ticker["Cum_Volume"] = comparison_ticker['Volume'].cumsum() # get the cumulative volume
 
-c_cumulative_volume = [c_first_hour, c_second_hour, c_third_hour, c_fourth_hour, c_fifth_hour, c_sixth_hour, c_seventh_hour]
+c_cumulative_volume = comparison_ticker["Cum_Volume"].tolist() # convert to list
 
-percentage_change = (c_cumulative_volume[-1] - cumulative_volume[-1]) / cumulative_volume[-1] * 100
+hour_to_compare = len(c_cumulative_volume) - 1
+percentage_change = (c_cumulative_volume[hour_to_compare] - cumulative_volume[hour_to_compare]) / cumulative_volume[hour_to_compare] * 100
 
 # plot the cumulative volume against the hours
 plt.figure(figsize=(10, 5))
-plt.plot(cumulative_volume, label="AVAT")
-plt.plot(c_cumulative_volume, label="RECENT")
-plt.xlabel("Hours")
+plt.plot(range(len(cumulative_volume)), cumulative_volume, label="AVAT")
+plt.plot(range(len(c_cumulative_volume)), c_cumulative_volume, label=f"""Recent {datetime.strptime(recent_date, '%Y-%m-%d %H:%M:%S').strftime('%A')}""")
+plt.xlabel("Hours (PM, GMT)")
+# Convert the hours to time
+hour_as_time = ["3:30", "4:30", "5:30", "6:30", "7:30", "8:30", "Close"]
+plt.xticks(range(len(cumulative_volume)), hour_as_time)
 plt.ylabel("Cumulative Volume")
 plt.title(f"{get_ticker} AVAT {get_days_range} days")
 plt.legend()
