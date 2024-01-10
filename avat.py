@@ -68,7 +68,7 @@ seventh_hour = np.mean(seventh_hour) + sixth_hour
 
 cumulative_volume = [first_hour, second_hour, third_hour, fourth_hour, fifth_hour, sixth_hour, seventh_hour]
 
-comparison_ticker = ticker[recent_date:] # get recent data
+comparison_ticker = ticker[recent_date:].copy() # get recent data
 comparison_ticker["Cum_Volume"] = comparison_ticker['Volume'].cumsum() # get the cumulative volume
 
 c_cumulative_volume = comparison_ticker["Cum_Volume"].tolist() # convert to list
