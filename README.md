@@ -1,5 +1,6 @@
 # Bloomberg-AVAT
 AVAT (Average Volume at Time) function inspired from Bloomberg Terminal to guide traders assessing recent momentum from volume analysis.
+The example product (AVAT graph) can be seen in the example.png, it only took approximately 1 second to produce 1 AVAT graph.
 
 ## Libraries required
 - Jupyter Notebook
